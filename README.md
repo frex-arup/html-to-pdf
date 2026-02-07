@@ -2,6 +2,12 @@
 
 A Next.js application that converts self-contained HTML files to selectable-text PDFs using Puppeteer.
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/frex-arup/html-to-pdf)
+
+## 🌐 Live Demo
+
+Deploy your own instance or try the live demo at your Vercel deployment URL.
+
 ## Features
 
 - 📄 Upload self-contained HTML files (HTML + CSS + JS inline)
@@ -9,6 +15,7 @@ A Next.js application that converts self-contained HTML files to selectable-text
 - ⚡ Fast conversion powered by Puppeteer
 - 🎨 Modern, responsive UI with glassmorphism design
 - 📱 Drag and drop file upload support
+- 📝 PDF filename automatically matches HTML title (defaults to `download.pdf`)
 
 ## Prerequisites
 
@@ -17,10 +24,11 @@ A Next.js application that converts self-contained HTML files to selectable-text
 
 ## Installation
 
-1. Navigate to the project directory:
+1. Clone the repository:
 
 ```bash
-cd html-upload-to-pdf-nextjs
+git clone https://github.com/frex-arup/html-to-pdf.git
+cd html-to-pdf
 ```
 
 2. Install dependencies:
@@ -48,13 +56,35 @@ npm run build
 npm run start
 ```
 
+## Deployment to Vercel
+
+### Option 1: One-Click Deploy
+
+Click the "Deploy with Vercel" button above, or:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/frex-arup/html-to-pdf)
+
+### Option 2: Connect GitHub Repository
+
+1. Go to [vercel.com](https://vercel.com) and sign in
+2. Click "Add New Project"
+3. Import the `frex-arup/html-to-pdf` repository
+4. Click "Deploy" (no configuration needed)
+
+### Option 3: Vercel CLI
+
+```bash
+npm i -g vercel
+vercel
+```
+
 ## Usage
 
-1. Open `http://localhost:3000` in your browser
+1. Open the application in your browser
 2. Click the upload area or drag and drop an HTML file
 3. Click "Generate PDF" button
 4. Wait for processing (loading indicator shown)
-5. PDF automatically downloads as `Resume.pdf`
+5. PDF automatically downloads with the HTML's `<title>` as filename
 
 ## Example Test Flow
 
@@ -68,7 +98,7 @@ Create a file named `test.html` with the following content:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sample Resume</title>
+    <title>John Doe Resume</title>
     <style>
         * {
             margin: 0;
@@ -134,43 +164,24 @@ Create a file named `test.html` with the following content:
 
     <div class="section">
         <h2>Summary</h2>
-        <p>Experienced software engineer with 5+ years of experience in full-stack development. Passionate about building scalable applications and mentoring junior developers.</p>
+        <p>Experienced software engineer with 5+ years of experience in full-stack development.</p>
     </div>
 
     <div class="section">
         <h2>Experience</h2>
-        
         <div class="job">
             <div class="job-title">Senior Software Engineer</div>
             <div class="company">Tech Corp Inc. | 2021 - Present</div>
             <ul>
                 <li>Led development of microservices architecture serving 1M+ users</li>
                 <li>Reduced API response time by 40% through optimization</li>
-                <li>Mentored team of 5 junior developers</li>
-            </ul>
-        </div>
-
-        <div class="job">
-            <div class="job-title">Software Engineer</div>
-            <div class="company">StartupXYZ | 2019 - 2021</div>
-            <ul>
-                <li>Built React-based dashboard used by 500+ enterprise clients</li>
-                <li>Implemented CI/CD pipeline reducing deployment time by 60%</li>
             </ul>
         </div>
     </div>
 
     <div class="section">
         <h2>Skills</h2>
-        <p>JavaScript, TypeScript, React, Node.js, Python, AWS, Docker, PostgreSQL, MongoDB, GraphQL</p>
-    </div>
-
-    <div class="section">
-        <h2>Education</h2>
-        <div class="job">
-            <div class="job-title">Bachelor of Science in Computer Science</div>
-            <div class="company">State University | 2015 - 2019</div>
-        </div>
+        <p>JavaScript, TypeScript, React, Node.js, Python, AWS, Docker</p>
     </div>
 </body>
 </html>
@@ -178,25 +189,25 @@ Create a file named `test.html` with the following content:
 
 ### Step 2: Upload and Convert
 
-1. Start the development server: `npm run dev`
-2. Open `http://localhost:3000`
-3. Upload `test.html`
-4. Click "Generate PDF"
-5. `Resume.pdf` will download automatically
+1. Open the application
+2. Upload `test.html`
+3. Click "Generate PDF"
+4. The file `John Doe Resume.pdf` will download automatically
 
 ## Project Structure
 
 ```
-html-upload-to-pdf-nextjs/
+html-to-pdf/
 ├── app/
-│   ├── layout.js           # Root layout
-│   ├── page.js              # Main upload page (Client Component)
+│   ├── layout.js              # Root layout
+│   ├── page.js                # Main upload page (Client Component)
 │   └── api/
 │       └── upload-html/
-│           └── route.js     # API route for PDF generation
-├── next.config.js           # Next.js configuration
-├── package.json             # Dependencies and scripts
-└── README.md                # This file
+│           └── route.js       # API route for PDF generation
+├── next.config.js             # Next.js configuration
+├── vercel.json                # Vercel deployment configuration
+├── package.json               # Dependencies and scripts
+└── README.md                  # This file
 ```
 
 ## API Endpoint
@@ -210,36 +221,32 @@ html-upload-to-pdf-nextjs/
 **Response:**
 - Success: PDF binary with headers:
   - `Content-Type: application/pdf`
-  - `Content-Disposition: attachment; filename=Resume.pdf`
+  - `Content-Disposition: attachment; filename="<title>.pdf"` or `download.pdf`
 - Error: JSON `{ "error": "error message" }`
+
+## Tech Stack
+
+- **Framework**: Next.js 14 (App Router)
+- **PDF Generation**: Puppeteer (local) / @sparticuz/chromium (Vercel)
+- **Styling**: Inline CSS with glassmorphism design
+- **Deployment**: Vercel
 
 ## Troubleshooting
 
-### Puppeteer Download Issues
+### Local Development Issues
 
-If Puppeteer fails to download Chromium, try:
+If Puppeteer fails to download Chromium:
 
 ```bash
 npx puppeteer browsers install chrome
 ```
 
-### Permission Errors on Linux
+### Vercel Deployment Issues
 
-Ensure the sandbox flags are set correctly (already configured in the API route):
+The app uses `@sparticuz/chromium` for serverless environments. If you encounter timeout issues:
 
-```javascript
-puppeteer.launch({
-  args: ['--no-sandbox', '--disable-setuid-sandbox']
-})
-```
-
-### Memory Issues
-
-For large HTML files, you may need to increase Node.js memory:
-
-```bash
-NODE_OPTIONS="--max-old-space-size=4096" npm run dev
-```
+1. Check `vercel.json` has sufficient `maxDuration` (default: 60s)
+2. Check memory allocation (default: 1024MB)
 
 ## License
 
