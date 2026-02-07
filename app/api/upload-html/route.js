@@ -1,6 +1,6 @@
 import puppeteerCore from 'puppeteer-core';
 import puppeteer from 'puppeteer';
-import chromium from '@sparticuz/chromium';
+import chromium from '@sparticuz/chromium-min';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
