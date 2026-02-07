@@ -1,15 +1,8 @@
 {
-    "buildCommand": "npm run build",
-    "outputDirectory": ".next",
-    "framework": "nextjs",
-    "regions": [
-        "iad1"
-    ],
     "functions": {
         "app/api/upload-html/route.js": {
             "memory": 3008,
             "maxDuration": 60
         }
-    },
-    "outputFileTracing": true
+    }
 }
