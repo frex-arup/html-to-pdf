@@ -23,17 +23,31 @@ function extractTitleFromHTML(html) {
     return null;
 }
 
-// Check if running in Vercel (serverless) environment
-const isVercel = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
+// Check if running in production/Vercel environment
+const isProduction = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
 
 async function getBrowser() {
-    if (isVercel) {
-        // Use @sparticuz/chromium for Vercel serverless
+    if (isProduction) {
+        // Configure chromium for serverless with explicit settings
+        chromium.setGraphicsMode = false;
+
+        const executablePath = await chromium.executablePath();
+
         return puppeteerCore.launch({
-            args: chromium.args,
+            args: [
+                ...chromium.args,
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-accelerated-2d-canvas',
+                '--no-first-run',
+                '--no-zygote',
+                '--disable-gpu',
+            ],
             defaultViewport: chromium.defaultViewport,
-            executablePath: await chromium.executablePath(),
+            executablePath: executablePath,
             headless: chromium.headless,
+            ignoreHTTPSErrors: true,
         });
     } else {
         // Use regular puppeteer for local development
@@ -94,14 +108,18 @@ export async function POST(request) {
 
         // Set the HTML content
         await page.setContent(htmlContent, {
-            waitUntil: 'networkidle0',
+            waitUntil: 'domcontentloaded',
             timeout: 30000,
         });
+
+        // Wait a bit for any dynamic content
+        await page.waitForTimeout(500);
 
         // Generate PDF with Letter format
         const pdfBuffer = await page.pdf({
             format: 'Letter',
             printBackground: true,
+            preferCSSPageSize: false,
             margin: {
                 top: '0.5in',
                 right: '0.5in',
@@ -126,6 +144,7 @@ export async function POST(request) {
 
     } catch (error) {
         console.error('PDF generation error:', error);
+        console.error('Error stack:', error.stack);
 
         // Make sure browser is closed on error
         if (browser) {
